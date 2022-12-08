@@ -84,7 +84,6 @@ def guided_total_score(guide: str) -> int:
         int: The total score the guide will net
     """
     rounds: list = get_rounds(guide)
-    rounds.pop() # Remove last blank line
 
     enemy_move: chr
     your_move: chr

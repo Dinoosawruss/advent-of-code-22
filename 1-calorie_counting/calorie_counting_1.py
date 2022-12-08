@@ -45,7 +45,6 @@ def get_highest_calories(elf_inventories_str: str) -> int:
     curr_max: int = -1
 
     elves: list = split_elf(elf_inventories_str)
-    elves.pop() # Remove last as it will just be ''
 
     for elf in elves:
         inventory: list = [int(x) for x in split_elves_inventory(elf)] 
