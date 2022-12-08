@@ -65,10 +65,7 @@ def calculate_priority(item: chr) -> int:
         int: The priority of that item
     """
     item = item.swapcase() # Uppercase are lower in ASCII values so lets swap them
-    steps_down: int = 64
-
-    if item.islower():
-        steps_down = 70 # Python has 7 values better uppercase and lowercase characters
+    steps_down: int = 70 if item.islower() else 64
 
     return ord(item) - steps_down
 
