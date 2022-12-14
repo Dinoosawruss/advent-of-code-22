@@ -33,11 +33,12 @@ def split_elves_inventory(inp: str) -> list:
     """
     return inp.split("\n")
 
-def get_highest_calories(elf_inventories_str: str) -> int:
+def get_highest_calories(elf_inventories_str: str, ignore: list=None) -> int:
     """Get the highest total calories
 
     Args:
         elf_inventories_str (str): The raw list of elf inventories
+        ignore (list, optional): Values to ignore (for problem 2)
 
     Returns:
         int: The highest total calories an elf has as an integer
@@ -47,19 +48,38 @@ def get_highest_calories(elf_inventories_str: str) -> int:
     elves: list = split_elf(elf_inventories_str)
 
     for elf in elves:
-        inventory: list = [int(x) for x in split_elves_inventory(elf)] 
+        inventory: list = [int(x) for x in split_elves_inventory(elf)]
         sum_inv: int = sum(inventory)
 
-        curr_max = sum_inv if sum_inv > curr_max else curr_max
+        curr_max = sum_inv if sum_inv > curr_max and not sum_inv in ignore else curr_max
 
     return curr_max
+
+def get_sum_three_highest_calories(elf_inventories_str: str) -> int:
+    """Get the sum of the top three highest calories
+
+    Args:
+        elf_inventories_str (str): _description_
+
+    Returns:
+        int: _description_
+    """
+    outp: list = []
+
+    for _ in range(3):
+        outp.append(get_highest_calories(elf_inventories_str, outp))
+
+    return sum(outp)
+
 
 def main():
     """Main function - execute logic and print result
     """
     highest_calories = get_highest_calories(read_input())
+    print(f"1: {highest_calories}")
 
-    print(highest_calories)
+    highest_three_calories = get_sum_three_highest_calories(read_input())
+    print(f"2: {highest_three_calories}")
 
 
 if __name__ == "__main__":
