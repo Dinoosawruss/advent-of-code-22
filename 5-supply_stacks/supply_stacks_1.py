@@ -105,7 +105,72 @@ def instruction_components(instruction: str) -> tuple[int, int, int]:
 
     return [int(x) for x in new_instruction.split("  ")]
 
-def compute_rearrangement(inp: str) -> list:
+def perform_move_mode_1(quantity: int, where_from: int, where_to: int, towers: list) -> list:
+    """Perform move with CrateMover 9000 which can only move 1 crate at a time
+
+    Args:
+        quantity (int): The number of crates to move
+        where_from (int): from position where_from
+        where_to (int): to position where_to
+        towers (list): in towers
+
+    Returns:
+        list: The final state of towers after that move
+    """
+    for _ in range(quantity):
+        crate: str = towers[where_from].pop()
+        towers[where_to].append(crate)
+
+    return towers
+
+def perform_move_mode_2(
+    quantity: int,
+    where_from: int,
+    where_to: int,
+    towers: list) -> list:
+    """Perform move with CrateMover 9001 which can only move several crates at a time
+
+    Args:
+        quantity (int): The number of crates to move
+        where_from (int): from position where_from
+        where_to (int): to position where_to
+        towers (list): in towers
+
+    Returns:
+        list: The final state of towers after that move
+    """
+    crates_to_move: list = []
+
+    for _ in range(quantity):
+        crates_to_move.insert(0, towers[where_from].pop())
+
+    for crate in crates_to_move:
+        towers[where_to].append(crate)
+
+    return towers
+
+def perform_move(
+    quantity: int,
+    where_from: int,
+    where_to: int,
+    towers: list,
+    move_mode: int) -> list:
+    """Call the correct move function depending on the move mode with params
+
+    Args:
+        quantity (int): The number of crates to move
+        where_from (int): from position where_from
+        where_to (int): to position where_to
+        towers (list): in towers
+        move_mode (int): The move mode to use
+
+    Returns:
+        list: The final state of the towers after the move is complete
+    """
+    return perform_move_mode_1(quantity, where_from, where_to, towers) if move_mode == 0 \
+        else perform_move_mode_2(quantity, where_from, where_to, towers)
+
+def compute_rearrangement(inp: str, move_mode: int=0) -> list:
     """Work out the final state of the towers based on the instructions
 
     Args:
@@ -126,9 +191,7 @@ def compute_rearrangement(inp: str) -> list:
         where_from -= 1
         where_to -= 1
 
-        for _ in range(quantity):
-            crate: str = towers[where_from].pop()
-            towers[where_to].append(crate)
+        towers = perform_move(quantity, where_from, where_to, towers, move_mode)
 
     return towers
 
@@ -152,8 +215,10 @@ def main():
     """Main function - do logic
     """
     towers: list = compute_rearrangement(read_input())
+    print(f"1: {find_message(towers)}")
 
-    print(find_message(towers))
+    towers: list = compute_rearrangement(read_input(), 1)
+    print(f"2: {find_message(towers)}")
 
 if __name__ == "__main__":
     main()
