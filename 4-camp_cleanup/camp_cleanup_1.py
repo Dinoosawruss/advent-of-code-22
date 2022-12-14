@@ -60,10 +60,21 @@ def split_min_and_max(inp: str) -> tuple[int, int]:
     values: list = inp.split("-")
     return int(values[0]), int(values[1])
 
-def is_intersect(reoccuring: list, elf1: Elf, elf2: Elf) -> bool:
+def is_intersect(reoccuring: list) -> bool:
+    """Determine whether the reoccuring pairs intersect at all
+
+    Args:
+        reoccuring (list): The reoccuring pairs
+
+    Returns:
+        bool: Whether they intersect (reoccuring length != 0)
+    """
+    return len(reoccuring) != 0
+
+def is_fully_contain(reoccuring: list, elf1: Elf, elf2: Elf) -> bool:
     """Logic for whether the two elf's ranges intersect
     If first item and last item of range == elf1 min and max
-    or 
+    or
     If first item and last item of range == elf 2 min and max
     We know that they must wholly contain eachother
 
@@ -84,18 +95,19 @@ def is_intersect(reoccuring: list, elf1: Elf, elf2: Elf) -> bool:
         (reoccuring[0] == elf2.min and reoccuring[-1] == elf2.max)
     )
 
-def count_fully_contain(inp: str) -> int:
-    """Find the count of elf pairs whose assignments fully contain the other
+def count_fully_contain_and_intersect(inp: str) -> tuple[int, int]:
+    """Count the total number of pairs that fully contain each other, and intersect at all
 
     Args:
-        inp (str): The raw string of all elf pairs
+        inp (str): The raw input
 
     Returns:
-        int: The number of elf pairs whose assignments fully contain the other
+        tuple[int, int]: The count that fully contain each other, the count that intersect at all
     """
     pairs = split_pairs(inp)
 
-    total: int = 0
+    total_fully_contain: int = 0
+    total_intersect: int = 0
 
     for pair in pairs:
         left, right = split_elves(pair)
@@ -105,16 +117,18 @@ def count_fully_contain(inp: str) -> int:
 
         elf_set: set = set(elf1.range & elf2.range)
 
-        total += 1 if is_intersect(list(elf_set), elf1, elf2) else 0
+        if is_intersect(elf_set):
+            total_intersect += 1
+            total_fully_contain += 1 if is_fully_contain(list(elf_set), elf1, elf2) else 0
 
-    return total
+    return total_fully_contain, total_intersect
 
 def main():
     """Main function - do logic
     """
-    count_fully_contained: int = count_fully_contain(read_input())
-
-    print(count_fully_contained)
+    result: tuple[int, int] = count_fully_contain_and_intersect(read_input())
+    print(f"1: {result[0]}")
+    print(f"2: {result[1]}")
 
 if __name__ == "__main__":
     main()
