@@ -55,8 +55,50 @@ def items_in_both_compartments(rucksack_raw: str) -> list:
 
     return items_in_both
 
+def split_groups(rucksack_raw: str) -> list:
+    """Split the raw input into groups of 3
+
+    Args:
+        rucksack_raw (str): The raw rucksack input
+
+    Returns:
+        list: Each group of 3 rucksacks
+    """
+    outp: list = []
+
+    rucksacks: list = split_rucksacks(rucksack_raw)
+
+    for i in range(len(rucksacks)//3):
+        index: int = i*3
+
+        outp.append([
+            rucksacks[index],
+            rucksacks[index + 1],
+            rucksacks[index + 2]
+        ])
+
+    return outp
+
+def identifiers_common_between_groups(rucksack_raw: str) -> list:
+    """Find all of the identifiers common between groups
+
+    Args:
+        rucksack_raw (str): The raw string of input
+
+    Returns:
+        list: A list of all common identifiers
+    """
+    group_identifiers: list = []
+
+    groups: list = split_groups(rucksack_raw)
+
+    for group in groups:
+        group_identifiers += set(group[0]) & set(group[1]) & set(group[2])
+
+    return group_identifiers
+
 def calculate_priority(item: chr) -> int:
-    """Calculate the priority of an item 
+    """Calculate the priority of an item
 
     Args:
         item (chr): The item to calculate the priority of
@@ -89,11 +131,12 @@ def main():
     """Main function - read input and do logic
     """
     items_in_both: list = items_in_both_compartments(read_input())
-
     total_priority = priority_sum(items_in_both)
+    print(f"1: {total_priority}")
 
-    print(total_priority)
-
+    group_identifiers: list = identifiers_common_between_groups(read_input())
+    total_priority = priority_sum(group_identifiers)
+    print(f"2: {total_priority}")
 
 if __name__ == "__main__":
     main()
