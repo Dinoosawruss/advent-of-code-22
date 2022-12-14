@@ -2,10 +2,22 @@
     https://adventofcode.com/2022/day/2
 """
 
-rules: dict[chr, chr] = {
+wins: dict[chr, chr] = {
     'A': 'Y', # Rock     - Paper
     'B': 'Z', # Paper    - Scissors
-    'C': 'X'  # Scissors - Rock
+    'C': 'X', # Scissors - Rock
+}
+
+loses: dict[chr, chr] = {
+    'A': 'Z', # Rock     - Scissors
+    'B': 'X', # Paper    - Rock
+    'C': 'Y'  # Scissors - Paper
+}
+
+draws: dict[chr, chr] = {
+    'A': 'X', # Rock     - Rock
+    'B': 'Y', # Paper    - Paper
+    'C': 'Z'  # Scissors - Scissors
 }
 
 points: dict[chr, int] = {
@@ -37,16 +49,28 @@ def get_rounds(inp: str) -> list:
     """
     return inp.split("\n")
 
-def get_play(inp: str) -> chr and chr:
-    """Get the play that was made in a round by each player
+def get_move(inp: str, standard_rule_set: bool) -> chr and chr:
+    """Work out the enemies and your move based on current conditions
 
     Args:
-        inp (str): That round as a string
+        inp (str): The move line string
+        standard_rule_set (bool, optional): Whether the standard or problem 2 rule set are in use
 
     Returns:
         chr and chr: The enemies move, your move
     """
-    return inp[0], inp[-1] # Enemy, You
+    enemy_move = inp[0]
+    instruction = inp[-1]
+
+    your_move: str = \
+        instruction if standard_rule_set \
+    else loses[enemy_move] if instruction == "X" \
+    else draws[enemy_move] if instruction == "Y" \
+    else wins[enemy_move] if instruction == "Z" \
+    else ""
+
+    return enemy_move, your_move
+
 
 def is_winner_you(enemy_move: chr, your_move: chr) -> chr:
     """Calculate whether you are the winner
@@ -60,7 +84,7 @@ def is_winner_you(enemy_move: chr, your_move: chr) -> chr:
     """
     enemy_converted: chr = chr(ord(enemy_move) + 23) # Align enemies moves to yours for draw check
 
-    return 'U' if rules[enemy_move] == your_move else 'D' if enemy_converted == your_move else 'E'
+    return 'U' if wins[enemy_move] == your_move else 'D' if enemy_converted == your_move else 'E'
 
 def calculate_points(your_move: chr, winner: chr) -> int:
     """Calculates the points from a round
@@ -74,7 +98,7 @@ def calculate_points(your_move: chr, winner: chr) -> int:
     """
     return points[your_move] + points[winner]
 
-def guided_total_score(guide: str) -> int:
+def guided_total_score(guide: str, standard_rule_set: bool=True) -> int:
     """Calculate the total score the guide will net you
 
     Args:
@@ -92,7 +116,7 @@ def guided_total_score(guide: str) -> int:
     total_points: int = 0
 
     for rnd in rounds:
-        enemy_move, your_move = get_play(rnd)
+        enemy_move, your_move = get_move(rnd, standard_rule_set)
         winner = is_winner_you(enemy_move, your_move)
         total_points += calculate_points(your_move, winner)
 
@@ -102,8 +126,10 @@ def main():
     """Main function - Do logic and print total score
     """
     total_score: int = guided_total_score(read_input())
+    print(f"1: {total_score}")
 
-    print(total_score)
+    total_score: int = guided_total_score(read_input(), False)
+    print(f"2: {total_score}")
 
 if __name__ == "__main__":
     main()
